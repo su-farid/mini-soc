@@ -1,0 +1,9 @@
+<decoder name="labshop">
+  <prematch>^labshop[</prematch>
+</decoder>
+
+<decoder name="labshop-detail">
+  <parent>labshop</parent>
+  <regex>^labshop[\d]: (\S) user=(\S) src=(\S)</regex>
+  <order>action, user, srcip</order>
+</decoder>

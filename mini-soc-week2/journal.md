@@ -1,4 +1,3 @@
-```markdown
 # Work Journal - Week 2 Mini-SOC Deployment
 
 ## Entry 1: Custom Log Source & Decoder Setup

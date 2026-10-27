@@ -3,10 +3,9 @@
 ## Overview & File Locations
 This repository documents the deployment of a Mini-SOC environment using Wazuh SIEM, custom decoders/rules, File Integrity Monitoring (FIM), Suricata NIDS integration, and SCA/Vulnerability Assessment.
 
-- **Custom Rules:** `rules/custom_labshop_rules.xml` (or `local_rules.xml`)
-- **Custom Decoders:** `decoders/custom_labshop_decoders.xml` (or `local_decoder.xml`)
+- **Custom Rules:** `rules/custom_labshop_rules.xml`
+- **Custom Decoders:** `decoders/custom_labshop_decoders.xml`
 - **Agent Configurations:** `evidence/week2/ossec_ubuntu.conf`, `evidence/week2/ossec_win.conf`
-- **Suricata Configurations:** `evidence/week2/labshop.rules`, `evidence/week2/suricata.yaml`
 
 ---
 
@@ -28,10 +27,10 @@ This repository documents the deployment of a Mini-SOC environment using Wazuh S
 ### Alert Summary Table
 | Machine / Object | Alert Type | Rule ID | Level | Description / Meaning |
 | :--- | :--- | :--- | :--- | :--- |
-| `ubuntu-web` (`/var/www/html/`) | File modified/deleted | 550 / 554 | 7 | Real-time web root file change with diff content |
-| `ubuntu-web` (`/etc/`) | File added | 550 | 5 | Scheduled check detected configuration file addition |
-| `win-client` (`C:\LabShopData`) | Directory change | 550 / 554 | 5 | Real-time file addition, modification, and deletion |
-| `win-client` (`HKLM\SOFTWARE\LabShop`) | Registry modified | 750 / 752 | 5 | Scheduled check detected registry key value modification |
+| `ubuntu-web` (`/var/www/html/`) | File added / modified / deleted | 554 / 550 / 553 | 5 / 7 / 7 | Real-time web root file change with diff content |
+| `ubuntu-web` (`/etc/`) | File added | 554 | 5 | Scheduled check detected configuration file addition |
+| `win-client` (`C:\LabShopData`) | File added / modified / deleted | 554 / 550 / 553 | 5 / 7 / 7 | Real-time file addition, modification, and deletion |
+| `win-client` (`HKLM\SOFTWARE\LabShop`) | Registry value modified | 750 | 5 | Scheduled check detected registry key value modification |
 
 ### Timing & Performance Table
 | Monitoring Mode | Target Directory / Object | Measured Alert Time |
@@ -78,3 +77,4 @@ docker cp decoders/custom_labshop_decoders.xml single-node-wazuh.manager-1:/var/
 docker cp rules/custom_labshop_rules.xml single-node-wazuh.manager-1:/var/ossec/etc/rules/local_rules.xml
 docker exec -it single-node-wazuh.manager-1 chown -R wazuh:wazuh /var/ossec/etc/decoders /var/ossec/etc/rules
 docker exec -it single-node-wazuh.manager-1 /var/ossec/bin/wazuh-control restart
+```

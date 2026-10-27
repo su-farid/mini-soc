@@ -1,19 +1,37 @@
-<!-- Local rules -->
-
-<!-- Modify it at your will. -->
-<!-- Copyright (C) 2015, Wazuh Inc. -->
-
-<!-- Example -->
-<group name="local,syslog,sshd,">
-
-  <!--
-  Dec 10 01:02:02 host sshd[1234]: Failed none for root from 1.1.1.1 port 1066 ssh2
-  -->
-  <rule id="100001" level="5">
-    <if_sid>5716</if_sid>
-    <srcip>1.1.1.1</srcip>
-    <description>sshd: authentication failed from IP 1.1.1.1.</description>
-    <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,</group>
+<group name="labshop,suricata,local,">
+  <!-- Task 1: LabShop Rules -->
+  <rule id="100100" level="0">
+    <decoded_as>labshop</decoded_as>
+    <user>monitor</user>
+    <description>LabShop: Monitor health check (ignored)</description>
   </rule>
 
+  <rule id="100101" level="5">
+    <decoded_as>labshop</decoded_as>
+    <action>LOGIN_FAILED</action>
+    <description>LabShop: Failed login for user $(dstuser)</description>
+  </rule>
+
+  <rule id="100102" level="10" frequency="5" timeframe="60">
+    <if_matched_sid>100101</if_matched_sid>
+    <same_source_ip />
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+    <description>LabShop: Brute force attack detected from IP $(srcip)</description>
+  </rule>
+
+  <rule id="100103" level="3">
+    <decoded_as>labshop</decoded_as>
+    <action>LOGIN_OK</action>
+    <description>LabShop: Successful login for user $(dstuser)</description>
+  </rule>
+
+  <!-- Task 3: Suricata Rule -->
+  <rule id="100110" level="10">
+    <if_sid>86600</if_sid>
+    <field name="event_type">http</field>
+    <match>/admin</match>
+    <description>Suricata: High Severity Admin Page Access Attempt</description>
+  </rule>
 </group>

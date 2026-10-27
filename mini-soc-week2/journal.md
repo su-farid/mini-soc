@@ -4,10 +4,10 @@
 - **Purpose:** Ingested `/var/log/labshop/app.log` via Wazuh Agent on `ubuntu-web` and configured parent/child decoders on Manager to extract `action`, `dstuser`, and `srcip`.
 - **Undo Procedure:** 
   1. Remove `<localfile>` block pointing to `/var/log/labshop/app.log` from `ossec.conf` on `ubuntu-web`.
-  2. Clear custom decoders from `local_decoder.xml` on Wazuh Manager and restart services.
+  2. Delete `labshop_decoders.xml` from `/var/ossec/etc/decoders/` on Wazuh Manager and restart services.
 
 ## Entry 2: LabShop Brute Force Detection Rules
-- **Purpose:** Configured rules 100100–100103. Created noise reduction rule (ID 100102, Level 0) for user `monitor` and brute force alert (ID 100101, Level 10, MITRE T1110) for 5 login failures within 60 seconds from the same IP.
+- **Purpose:** Configured rules 100100–100103. Created noise reduction rule (ID 100100, Level 0) for user `monitor` and failed login rule (ID 100101, Level 5) and brute force alert (ID 100102, Level 10, MITRE T1110) for 5 login failures within 60 seconds from the same IP.
 - **Undo Procedure:** 
   1. Delete custom rules from `local_rules.xml`.
   2. Run `/var/ossec/bin/wazuh-analysisd -t` and restart Wazuh Manager.
@@ -19,7 +19,7 @@
   2. Restart agents (`systemctl restart wazuh-agent` / `Restart-Service WazuhSvc`).
 
 ## Entry 4: Suricata NIDS Integration
-- **Purpose:** Deployed Suricata on `ubuntu-web`, configured HTTP `/admin` URI inspection rule (SID 1000001), forwarded `eve.json` to Wazuh, and set up Wazuh Rule 100110 (Level 10).
+- **Purpose:** Deployed Suricata on `ubuntu-web`, configured HTTP `/admin` URI inspection rule (SID 1000001), forwarded `eve.json` to Wazuh, and set up Wazuh Rule 100110 (Level 10) that raises Suricata alert signature_id 1000001 (child of rule 86601).
 - **Undo Procedure:** 
   1. Disable Suricata (`sudo systemctl disable --now suricata`).
   2. Remove Suricata log block from agent `ossec.conf` and Rule 100110 from Manager.

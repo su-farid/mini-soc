@@ -29,9 +29,8 @@
 
   <!-- Task 3: Suricata Rule -->
   <rule id="100110" level="10">
-    <if_sid>86600</if_sid>
-    <field name="event_type">http</field>
-    <match>/admin</match>
-    <description>Suricata: High Severity Admin Page Access Attempt</description>
-  </rule>
+  <if_sid>86601</if_sid>
+  <field name="alert.signature_id">1000001</field>
+  <description>Suricata: High Severity Admin Page Access Attempt</description>
+</rule>
 </group>

@@ -4,7 +4,7 @@
 This repository documents the deployment of a Mini-SOC environment using Wazuh SIEM, custom decoders/rules, File Integrity Monitoring (FIM), Suricata NIDS integration, and SCA/Vulnerability Assessment.
 
 - **Custom Rules:** `rules/custom_labshop_rules.xml`
-- **Custom Decoders:** `decoders/custom_labshop_decoders.xml`
+- **Custom Decoders:** `decoders/labshop_decoders.xml`
 - **Agent Configurations:** `evidence/week2/ossec_ubuntu.conf`, `evidence/week2/ossec_win.conf`
 
 ---
@@ -14,11 +14,12 @@ This repository documents the deployment of a Mini-SOC environment using Wazuh S
 ### Test Results Table
 | Test Case | Expected Result | `wazuh-logtest` Output | Dashboard Output |
 | :--- | :--- | :--- | :--- |
-| **1 Failure** | Rule 100100 (Level 5) triggers | Decoded `LOGIN_FAILED`, Rule 100100 matched | Alert generated (Level 5) |
-| **5 Failures (1 IP)** | 5th attempt triggers Rule 100101 (Level 10, MITRE T1110) | Rule 100101 matched (Brute force detected within 60s) | Brute Force Alert (Level 10, T1110 tag) |
-| **3 Failures (2 IPs)** | Only Rule 100100 triggers per IP separately | Rule 100100 matched for both IPs independently | Two separate Level 5 alerts |
-| **Failure by Monitor** | Rule 100102 (Level 0, Ignored) | Rule 100102 matched (expected noise, ignored) | No alert generated (Filtered) |
+| **1 Failure** | Rule 100101 (Level 5) triggers | Decoded `LOGIN_FAILED`, Rule 100101 matched | Alert generated (Level 5) |
+| **6 Failures (1 IP)** | Rule 100102 (Level 10, MITRE T1110) fires within 60s | Six `LOGIN_FAILED` lines from 10.10.10.50 appended to `app.log`; Rule 100102 fired | Brute Force Alert (Level 10, T1110): "LabShop: Brute force attack detected from IP 10.10.10.50" |
+| **3 Failures (2 IPs)** | Only Rule 100101 triggers per IP separately | Rule 100101 matched for both IPs independently | Two separate Level 5 alerts |
+| **Failure by Monitor** | Rule 100100 (Level 0, Ignored) | Rule 100100 matched (expected noise, ignored) | No alert generated (Filtered) |
 | **LOGIN_OK** | Rule 100103 (Level 3) | Decoded `LOGIN_OK`, Rule 100103 matched | Alert generated (Level 3) |
+| **Wrong format line** | Only the parent decoder matches, no rule fires | Phase 2: decoder `labshop` only, no fields extracted; no Phase 3 rule | No alert generated |
 
 ---
 
@@ -73,8 +74,9 @@ This repository documents the deployment of a Mini-SOC environment using Wazuh S
 ## Restoration Instructions
 If the Wazuh Manager container is rebuilt or reset, restore custom rules and decoders using:
 ```bash
-docker cp decoders/custom_labshop_decoders.xml single-node-wazuh.manager-1:/var/ossec/etc/decoders/local_decoder.xml
+docker cp decoders/labshop_decoders.xml single-node-wazuh.manager-1:/var/ossec/etc/decoders/labshop_decoders.xml
 docker cp rules/custom_labshop_rules.xml single-node-wazuh.manager-1:/var/ossec/etc/rules/local_rules.xml
-docker exec -it single-node-wazuh.manager-1 chown -R wazuh:wazuh /var/ossec/etc/decoders /var/ossec/etc/rules
-docker exec -it single-node-wazuh.manager-1 /var/ossec/bin/wazuh-control restart
+docker exec single-node-wazuh.manager-1 chown wazuh:wazuh /var/ossec/etc/decoders/labshop_decoders.xml /var/ossec/etc/rules/local_rules.xml
+docker exec single-node-wazuh.manager-1 /var/ossec/bin/wazuh-analysisd -t
+docker exec single-node-wazuh.manager-1 /var/ossec/bin/wazuh-control restart
 ```

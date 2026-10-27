@@ -1,0 +1,9 @@
+<decoder name="labshop">
+  <program_name>^labshop</program_name>
+</decoder>
+
+<decoder name="labshop-event">
+  <parent>labshop</parent>
+  <regex>^(\w+) user=(\w+) src=(\S+)</regex>
+  <order>action,dstuser,srcip</order>
+</decoder>
